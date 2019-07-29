@@ -15,6 +15,7 @@
 #include <queue>
 #include <map>
 #include <cctype>
+#include <boost/algorithm/string.hpp>
 
 #include <steam/steamnetworkingsockets.h>
 #include <steam/isteamnetworkingutils.h>
@@ -294,6 +295,18 @@ private:
 		}
 	}
 
+	void SendStringToWhisperClient(const char *sender, const char *reciever, const char *str, HSteamNetConnection except = k_HSteamNetConnection_Invalid){
+		std::map<HSteamNetConnection,Client_t>::iterator it;
+		char tempstr[1024];
+		sprintf(tempstr, "%s whispered: %s",sender,str);
+		//sprintf( temp, "%s shall henceforth be known as %s", itClient->second.m_sNick.c_str(), nick );
+		for (it = m_mapClients.begin(); it != m_mapClients.end(); it++){
+			if((strcmp(reciever ,it->second.m_sNick.c_str()) == 0) and it->first != except){
+				SendStringToClient(it->first, tempstr);
+			}
+	}
+}
+
 	void PollIncomingMessages()
 	{
 		char temp[ 1024 ];
@@ -339,6 +352,50 @@ private:
 				SetClientNick( itClient->first, nick );
 				continue;
 			}
+			else if (strncmp(cmd, "/wave", 5) == 0){
+
+				sprintf(temp, "%s waved at everyone", itClient->second.m_sNick.c_str());
+				SendStringToAllClients( temp, itClient->first );
+
+				// Respond to client
+				SendStringToClient( itClient->first, "You waved at everyone" );
+
+				continue;
+			}
+			else if (strncmp(cmd, "/whisper", 8) == 0){
+			  const char *reciever = cmd+9;
+				const char *sender = itClient->second.m_sNick.c_str();
+				std::vector<std::string> internal;
+				std::stringstream ss(reciever); // Turn the string into a stream.
+				std::string tok;
+
+				while(getline(ss, tok, ' ')) {
+				    internal.push_back(tok);
+				}
+				reciever = internal.at(0).c_str();
+				const char *message;
+  		int arraySize = internal.size();
+			std::string fullmessage;
+			for (int i = 1; i<arraySize; i++){
+				fullmessage += internal.at(i) + " ";
+			}
+			message = fullmessage.c_str();
+					std::map<HSteamNetConnection,Client_t>::iterator it;
+					for (it = m_mapClients.begin(); it != m_mapClients.end(); it++){
+						if(strcmp(reciever ,it->second.m_sNick.c_str()) == 0 ){
+							//reciever = strchr(reciever, ' ');
+							//const char *message = strdup(reciever);
+							sprintf(temp, "You whispered to %s: %s",reciever,message);
+							SendStringToClient(itClient->first, temp);
+							SendStringToWhisperClient(sender,reciever,message,itClient->first);
+							continue;
+						}
+					}
+				//SendStringToClient(itClient->first, "Failed to send Whisper.");
+
+				continue;
+
+				}
 
 			// Assume it's just a ordinary chat message, dispatch to everybody else
 			sprintf( temp, "%s: %s", itClient->second.m_sNick.c_str(), cmd );
@@ -474,31 +531,34 @@ private:
 				// but not logged on) until them.  I'm trying to keep this example
 				// code really simple.
 				char nick[ 64 ];
-				sprintf( nick, "BraveWarrior%d", 10000 + ( rand() % 100000 ) );
+				sprintf( nick, "User%d", 100 + ( rand() % 10 ) );
 
 				// Send them a welcome message
-				sprintf( temp, "Welcome, stranger.  Thou art known to us for now as '%s'; upon thine command '/nick' we shall know thee otherwise.", nick ); 
-				SendStringToClient( pInfo->m_hConn, temp ); 
+				sprintf( temp, "Welcome, stranger.  Thou art known to us for now as '%s'; upon thine command '/nick' we shall know thee otherwise.", nick );
+				SendStringToClient( pInfo->m_hConn, temp );
 
 				// Also send them a list of everybody who is already connected
 				if ( m_mapClients.empty() )
 				{
-					SendStringToClient( pInfo->m_hConn, "Thou art utterly alone." ); 
+					SendStringToClient( pInfo->m_hConn, "Thou art utterly alone." );
 				}
 				else
 				{
-					sprintf( temp, "%d companions greet you:", (int)m_mapClients.size() ); 
+					sprintf( temp, "%d companions greet you:", (int)m_mapClients.size() );
 					for ( auto &c: m_mapClients )
-						SendStringToClient( pInfo->m_hConn, c.second.m_sNick.c_str() ); 
+						SendStringToClient( pInfo->m_hConn, c.second.m_sNick.c_str() );
+						//Printf("Client");
 				}
 
 				// Let everybody else know who they are for now
-				sprintf( temp, "Hark!  A stranger hath joined this merry host.  For now we shall call them '%s'", nick ); 
-				SendStringToAllClients( temp, pInfo->m_hConn ); 
+				sprintf( temp, "Hark!  A stranger hath joined this merry host.  For now we shall call them '%s'", nick );
+				SendStringToAllClients( temp, pInfo->m_hConn );
 
 				// Add them to the client list, using std::map wacky syntax
 				m_mapClients[ pInfo->m_hConn ];
 				SetClientNick( pInfo->m_hConn, nick );
+				auto itClient = m_mapClients.find( pInfo->m_hConn );
+				Printf(itClient->second.m_sNick.c_str());
 				break;
 			}
 

@@ -21,8 +21,8 @@
 #endif
 #define STEAMNETWORKINGSOCKETS_STANDALONELIB
 
-#include <minbase/minbase_identify.h>
-#include <minbase/minbase_decls.h>
+#include "minbase/minbase_identify.h"
+#include "minbase/minbase_decls.h"
 #include "steamtypes.h"
 #include "steamclientpublic.h"
 
@@ -40,7 +40,7 @@ enum { k_iSteamNetworkingSocketsCallbacks = 1220 };
 enum { k_iSteamNetworkingMessagesCallbacks = 1250 };
 enum { k_iSteamNetworkingUtilsCallbacks = 1280 };
 
-// 
+//
 //----------------------------------------
 
 
@@ -371,7 +371,7 @@ enum ESteamNetworkingConnectionState
 	/// read it back.  Typically this is not a problem, as application protocols that utilize
 	/// the lingering functionality are designed for the remote host to wait for the response
 	/// before sending any more data.
-	k_ESteamNetworkingConnectionState_Linger = -2, 
+	k_ESteamNetworkingConnectionState_Linger = -2,
 
 	/// Connection is completely inactive and ready to be destroyed
 	k_ESteamNetworkingConnectionState_Dead = -3,
@@ -413,7 +413,7 @@ enum ESteamNetConnectionEnd
 	// 2xxx: Application ended the connection in some sort of exceptional
 	//       or unusual manner that might indicate a bug or configuration
 	//       issue.
-	// 
+	//
 	k_ESteamNetConnectionEnd_AppException_Min = 2000,
 		k_ESteamNetConnectionEnd_AppException_Generic = k_ESteamNetConnectionEnd_AppException_Min,
 		// Use codes in this range for "unusual" disconnection
@@ -811,7 +811,7 @@ const int k_nSteamNetworkingSend_NoDelay = 4;
 // if a message is dropped for these reasons, k_EResultIgnored will be returned.
 const int k_nSteamNetworkingSend_UnreliableNoDelay = k_nSteamNetworkingSend_Unreliable|k_nSteamNetworkingSend_NoDelay|k_nSteamNetworkingSend_NoNagle;
 
-// Reliable message send. Can send up to k_cbMaxSteamNetworkingSocketsMessageSizeSend bytes in a single message. 
+// Reliable message send. Can send up to k_cbMaxSteamNetworkingSocketsMessageSizeSend bytes in a single message.
 // Does fragmentation/re-assembly of messages under the hood, as well as a sliding window for
 // efficient sends of large chunks of data.
 //
@@ -947,7 +947,7 @@ enum ESteamNetworkingConfigValue
 	k_ESteamNetworkingConfig_SendBufferSize = 9,
 
 	/// [connection int32] Minimum/maximum send rate clamp, 0 is no limit.
-	/// This value will control the min/max allowed sending rate that 
+	/// This value will control the min/max allowed sending rate that
 	/// bandwidth estimation is allowed to reach.  Default is 0 (no-limit)
 	k_ESteamNetworkingConfig_SendRateMin = 10,
 	k_ESteamNetworkingConfig_SendRateMax = 11,
@@ -957,7 +957,7 @@ enum ESteamNetworkingConfigValue
 	/// queued for a delay equal to the Nagle timer value.  This is to ensure
 	/// that if the application sends several small messages rapidly, they are
 	/// coalesced into a single packet.
-	/// See historical RFC 896.  Value is in microseconds. 
+	/// See historical RFC 896.  Value is in microseconds.
 	/// Default is 5000us (5ms).
 	k_ESteamNetworkingConfig_NagleTime = 12,
 
@@ -977,8 +977,8 @@ enum ESteamNetworkingConfigValue
 	/// packet, so setting this to 1 may greatly disrupt communications.
 	k_ESteamNetworkingConfig_SDRClient_ConsecutitivePingTimeoutsFailInitial = 19,
 
-	/// [int32 global] If N consecutive pings to a port fail, after having received successful 
-	/// communication, mark that port as unavailable for a while, and try a 
+	/// [int32 global] If N consecutive pings to a port fail, after having received successful
+	/// communication, mark that port as unavailable for a while, and try a
 	/// different one.
 	k_ESteamNetworkingConfig_SDRClient_ConsecutitivePingTimeoutsFail = 20,
 
@@ -1012,7 +1012,7 @@ enum ESteamNetworkingConfigValue
 
 	//
 	// Log levels for debuging information.  A higher priority
-	// (lower numeric value) will cause more stuff to be printed.  
+	// (lower numeric value) will cause more stuff to be printed.
 	//
 	k_ESteamNetworkingConfig_LogLevel_AckRTT = 13, // [connection int32] RTT calculations for inline pings and replies
 	k_ESteamNetworkingConfig_LogLevel_PacketDecode = 14, // [connection int32] log SNP packets send

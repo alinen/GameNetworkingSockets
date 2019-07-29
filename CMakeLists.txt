@@ -1,3 +1,4 @@
+Project(GameNetworkingSockets)
 cmake_minimum_required(VERSION 3.5)
 
 include(CMakeDependentOption)
@@ -7,6 +8,7 @@ include(CheckSymbolExists)
 project(GameNetworkingSockets C CXX)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
+set(LIBRARY_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/lib)
 
 include(DefaultBuildType)
 find_package(Sanitizers)
