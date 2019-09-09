@@ -15,6 +15,7 @@
 #include <queue>
 #include <map>
 #include <cctype>
+#include <sstream>
 #include <boost/algorithm/string.hpp>
 
 #include <steam/steamnetworkingsockets.h>
